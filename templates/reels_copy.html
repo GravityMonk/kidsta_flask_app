@@ -1,0 +1,739 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Reels - KIDSTA APP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    /* simple friendly styles for kids */
+    :root{
+      --primary: #ff6b6b;   /* bright red/pink */
+      --accent: #ffd166;    /* yellow */
+      --bg: #fff9f2;        /* soft background */
+      --card: #ffffff;
+      --muted: #6b7280;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      color:#222;
+    }
+
+    .topbar{
+      background: linear-gradient(90deg,#4a90e2,#7cc4ff);
+      color:white;
+      padding:12px 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-weight:600;
+    }
+
+    .container{
+      max-width:640px;
+      margin:10px auto;
+      padding:12px;
+    }
+
+    .video-preview {
+      background:var(--card);
+      height:420px;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border: 2px dashed #e6e6e6;
+      position:relative;
+      overflow:hidden;
+    }
+    .video-preview p{color:var(--muted);}
+
+    /* bottom controls area */
+    .controls {
+      margin-top:14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn {
+      padding:10px 14px;
+      border-radius:999px;
+      border:none;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+      background:white;
+    }
+
+    .btn-add {
+      background:#fff;
+      border:2px solid var(--primary);
+      color:var(--primary);
+    }
+
+    /* big round record button bottom center */
+    .record-wrap{
+      display:flex;
+      justify-content:center;
+      margin-top:18px;
+    }
+
+    .record-button {
+      width:92px;
+      height:92px;
+      border-radius:50%;
+      background: radial-gradient(circle at 35% 30%, #ff8a8a, var(--primary));
+      border:6px solid rgba(255,255,255,0.6);
+      box-shadow:0 10px 30px rgba(255,107,107,0.25);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-size:16px;
+      font-weight:700;
+    }
+
+    .small-note { text-align:center; color:var(--muted); font-size:13px; margin-top:8px; }
+
+    /* modal to show "open library" message */
+    .modal {
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,0.35);
+      z-index:2000;
+    }
+    .modal .box{
+      background:white;
+      padding:16px;
+      border-radius:12px;
+      width:92%;
+      max-width:520px;
+      text-align:center;
+    }
+    .modal .box button{ margin-top:10px; }
+
+    /* audio list inside modal */
+    .audio-list {
+      text-align:left;
+      margin-top:10px;
+      max-height:220px;
+      overflow:auto;
+      border:1px solid #f0f0f0;
+      padding:8px;
+      border-radius:8px;
+      background:#fafafa;
+    }
+    .audio-item {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:8px;
+      margin-bottom:6px;
+      border-radius:8px;
+      background:white;
+      border:1px solid #eee;
+      cursor:pointer;
+    }
+    .audio-item:hover { background:#f7fbff; }
+
+    @media (max-width:480px){
+      .video-preview{ height:70vh; }
+      .container{ padding:10px; margin:6px; }
+      .record-button{ width:76px; height:76px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div><strong>KIDSTA APP</strong></div>
+    <div>
+      <a href="/home" style="color:white; text-decoration:none; font-weight:600; margin-right:12px;">Home</a>
+      <a href="/profile" style="color:white; text-decoration:none;">Profile</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h3 style="margin:0 0 8px 0;">Create a Reel</h3>
+
+    <!-- big preview area -->
+    <div class="video-preview" id="previewArea">
+      <p id="previewText">No recording yet. Press the round button to record.</p>
+    </div>
+
+    <!-- controls -->
+    <div class="controls">
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-add" id="addSongBtn">➕ Add Song</button>
+        <button class="btn" id="makeVideoBtn">🎬 Make Video</button>
+        <button class="btn" id="takePhotoBtn">📸 Take Photo</button>
+
+        <label class="btn" style="cursor:pointer; display:inline-flex; align-items:center;">
+          📁 Upload Photos
+          <input id="uploadPhotos" type="file" accept="image/*,video/*" multiple style="display:none">
+        </label>
+      </div>
+
+      <div style="text-align:right; min-width:200px;">
+        <div style="font-size:12px; color:var(--muted)">Max 60 seconds</div>
+        <div style="font-size:13px; margin-top:6px; font-weight:600">Selected: <span id="selectedSong">None</span></div>
+      </div>
+    </div>
+
+
+    <div id="thumbs"
+       style="max-width:640px; margin:12px auto;
+              display:flex; gap:8px; flex-wrap:wrap;">
+    </div>
+
+
+    <!-- big round record -->
+    <div class="record-wrap">
+      <button class="record-button" id="recordBtn">● RECORD</button>
+    </div>
+    <div class="small-note">Tap RECORD to start. Tap again to stop.</div>
+  </div>
+
+  <!-- improved modal: audio library now shows inside modal -->
+  <div class="modal" id="songModal">
+    <div class="box">
+      <h4>Select a song</h4>
+      <p style="margin:6px 0 10px 0; color:var(--muted)">Pick a song from library or type filename below.</p>
+
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <input id="songInput" placeholder="Type song filename (e.g. Hush_Now_My_Baby.mp3)" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd" />
+        <button class="btn btn-add" id="saveSongBtn">Save</button>
+      </div>
+
+      <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">Or choose from library:</div>
+      <div class="audio-list" id="audioList">
+        <!-- loaded by JS -->
+        <div style="color:#999; text-align:center;">Loading songs…</div>
+      </div>
+
+      <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+        <button class="btn" id="closeModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // elements
+  const addSongBtn = document.getElementById('addSongBtn');
+  const songModal = document.getElementById('songModal');
+  const closeModal = document.getElementById('closeModal');
+  const saveSongBtn = document.getElementById('saveSongBtn');
+  const songInput = document.getElementById('songInput');
+  const selectedSong = document.getElementById('selectedSong');
+  const recordBtn = document.getElementById('recordBtn');
+  const previewArea = document.getElementById('previewArea');
+  const previewText = document.getElementById('previewText');
+  const audioList = document.getElementById('audioList');
+
+  // photo UI
+  const takePhotoBtn = document.getElementById('takePhotoBtn');
+  const uploadPhotos = document.getElementById('uploadPhotos');
+  const thumbs = document.getElementById('thumbs');
+
+  // state
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let recording = false;
+  let timerInterval = null;
+  let seconds = 0;
+  const MAX_SECONDS = 60;
+
+  let photos = []; // data URLs for thumbs (can be images or pick video thumbnails)
+
+  // ---------------- audio modal + library ----------------
+  addSongBtn && addSongBtn.addEventListener('click', () => {
+    songModal.style.display = 'flex';
+    loadAudioLibrary();
+  });
+
+  closeModal && closeModal.addEventListener('click', () => {
+    songModal.style.display = 'none';
+  });
+
+  saveSongBtn && saveSongBtn.addEventListener('click', () => {
+    const v = songInput.value.trim();
+    if (!v) { alert('Please type the song filename (example: Hush_Now_My_Baby.mp3)'); return; }
+    setSelectedSong(v);
+    songModal.style.display = 'none';
+    songInput.value = '';
+  });
+
+  // fetch server audio list and render into modal
+  async function loadAudioLibrary() {
+    audioList.innerHTML = '<div style="color:#999; text-align:center;">Loading songs…</div>';
+    try {
+      const r = await fetch('/api/audio_files');
+      if (!r.ok) throw new Error('Network');
+      const files = await r.json();
+      audioList.innerHTML = '';
+      if (!files || files.length === 0) {
+        audioList.innerHTML = '<div style="color:#666; text-align:center;">No songs in library</div>';
+        return;
+      }
+      files.forEach(fn => {
+        const div = document.createElement('div');
+        div.className = 'audio-item';
+        div.innerHTML = `<div style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">${fn}</div>
+                         <div style="margin-left:8px;"><button class="use-btn" style="padding:6px 8px; border-radius:8px; border:none; background:#4a90e2; color:white;">Use</button></div>`;
+        // clicking the row or the Use button will set song
+        div.querySelector('.use-btn').addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          setSelectedSong(fn);
+          songModal.style.display = 'none';
+        });
+        div.addEventListener('click', () => {
+          setSelectedSong(fn);
+          songModal.style.display = 'none';
+        });
+        audioList.appendChild(div);
+      });
+    } catch (e) {
+      console.error('Could not load audio library', e);
+      audioList.innerHTML = '<div style="color:#c00; text-align:center;">Error loading songs</div>';
+    }
+  }
+
+  // set selected song in UI and global var
+  function setSelectedSong(name) {
+    selectedSong.textContent = name;
+    window.selectedSongName = name; // for your recording logic to read
+    console.log('Selected song set to:', name);
+  }
+
+  // ---------------- recording helpers ----------------
+  function updateRecordLabel() {
+    if (!recording) {
+      recordBtn.textContent = '● RECORD';
+      recordBtn.style.fontSize = '16px';
+      recordBtn.disabled = false;
+      recordBtn.style.opacity = '1';
+    } else {
+      const mm = String(Math.floor(seconds / 60)).padStart(2,'0');
+      const ss = String(seconds % 60).padStart(2,'0');
+      recordBtn.textContent = `${mm}:${ss}`;
+      recordBtn.style.fontSize = '18px';
+    }
+  }
+
+  function showPreviewURL(url, blob) {
+    previewArea.innerHTML = '';
+    const video = document.createElement('video');
+    video.controls = true;
+    video.src = url;
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.objectFit = 'contain';
+    previewArea.appendChild(video);
+
+    const uploadWrap = document.createElement('div');
+    uploadWrap.style.position = 'absolute';
+    uploadWrap.style.bottom = '12px';
+    uploadWrap.style.left = '50%';
+    uploadWrap.style.transform = 'translateX(-50%)';
+    uploadWrap.style.zIndex = '10';
+    previewArea.appendChild(uploadWrap);
+
+    const uploadBtn = document.createElement('button');
+    uploadBtn.textContent = 'UPLOAD →';
+    uploadBtn.className = 'btn btn-add';
+    uploadBtn.style.padding = '10px 20px';
+    uploadBtn.onclick = () => uploadReelBlob(blob || url);
+    uploadWrap.appendChild(uploadBtn);
+  }
+
+  // upload recorded blob to server
+  async function uploadReelBlob(videoOrBlob) {
+    let blob;
+    if (videoOrBlob instanceof Blob) blob = videoOrBlob;
+    else {
+      const resp = await fetch(videoOrBlob);
+      blob = await resp.blob();
+    }
+
+    const fd = new FormData();
+    fd.append('video', blob, 'reel_video.webm');
+    const songName = selectedSong.textContent && selectedSong.textContent !== 'None' ? selectedSong.textContent : '';
+    fd.append('song', songName);
+
+    // disable UI
+    recordBtn.disabled = true;
+    recordBtn.style.opacity = '0.6';
+
+    try {
+      const res = await fetch('/upload_reel', { method: 'POST', body: fd });
+      const j = await res.json();
+      if (j.ok) {
+        window.location = j.redirect || '/home';
+      } else {
+        alert('Upload failed: ' + (j.message || 'Server error'));
+        recordBtn.disabled = false;
+        recordBtn.style.opacity = '1';
+        updateRecordLabel();
+      }
+    } catch (e) {
+      alert('Network error during upload');
+      recordBtn.disabled = false;
+      recordBtn.style.opacity = '1';
+      updateRecordLabel();
+    }
+  }
+
+  // ---------------- start/stop recording ----------------
+  async function startRecording() {
+    let songName = selectedSong.textContent && selectedSong.textContent !== 'None' ? selectedSong.textContent : '';
+
+    // get video stream
+    let videoStream;
+    try {
+      videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+    } catch (e) {
+      alert('Camera permission needed. Please allow camera in the browser.');
+      return;
+    }
+
+    let micStream = null;
+    let audioEl = null;
+    let audioCtx = null;
+    let dest = null;
+
+    // if song selected: prepare MediaElement -> MediaStreamDestination
+    if (songName) {
+      try {
+        const audioUrl = '/audio/' + encodeURIComponent(songName);
+        audioEl = new Audio(audioUrl);
+        audioEl.crossOrigin = 'anonymous';
+        audioEl.loop = false;
+        audioEl.volume = 1.0;
+
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // resume if suspended
+        if (audioCtx.state === 'suspended') {
+          try { await audioCtx.resume(); } catch(e){ console.warn('resume failed', e); }
+        }
+
+        const songSource = audioCtx.createMediaElementSource(audioEl);
+        dest = audioCtx.createMediaStreamDestination();
+
+        // connect song to speakers (so user hears while recording) and to dest (for recording)
+        try {
+          songSource.connect(audioCtx.destination);
+          songSource.connect(dest);
+        } catch (connErr) {
+          console.warn('connect error:', connErr);
+        }
+
+        try {
+          await audioEl.play();
+        } catch (err) {
+          console.warn('Could not autoplay song:', err);
+        }
+      } catch (err) {
+        console.warn('Error preparing song audio; falling back to mic-only.', err);
+        if (audioCtx) try { audioCtx.close(); } catch(e){}
+        audioEl = null;
+        dest = null;
+      }
+    } else {
+      // no song: get mic
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (e) {
+        alert('Microphone permission needed to record voice. Please allow mic in the browser.');
+      }
+    }
+
+    // assemble final stream (video + audio track)
+    const finalStream = new MediaStream();
+    const vTrack = videoStream.getVideoTracks()[0];
+    if (vTrack) finalStream.addTrack(vTrack);
+
+    if (dest && dest.stream && dest.stream.getAudioTracks().length > 0) {
+      finalStream.addTrack(dest.stream.getAudioTracks()[0]);
+    } else if (micStream && micStream.getAudioTracks().length > 0) {
+      finalStream.addTrack(micStream.getAudioTracks()[0]);
+    } else {
+      // no audio
+    }
+
+    // show live camera preview (muted)
+    previewArea.innerHTML = '';
+    const liveVideo = document.createElement('video');
+    liveVideo.autoplay = true;
+    liveVideo.muted = true;
+    liveVideo.playsInline = true;
+    liveVideo.srcObject = videoStream;
+    liveVideo.style.width = '100%';
+    liveVideo.style.height = '100%';
+    liveVideo.style.objectFit = 'cover';
+    previewArea.appendChild(liveVideo);
+
+    // start MediaRecorder
+    recordedChunks = [];
+    try {
+      mediaRecorder = new MediaRecorder(finalStream, { mimeType: 'video/webm; codecs=vp8,opus' });
+    } catch (err) {
+      mediaRecorder = new MediaRecorder(finalStream);
+    }
+
+    mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      try { if (videoStream) videoStream.getTracks().forEach(t => t.stop()); } catch(e){}
+      try { if (micStream) micStream.getTracks().forEach(t => t.stop()); } catch(e){}
+
+      if (audioEl) {
+        try { audioEl.pause(); audioEl.currentTime = 0; } catch(e){}
+      }
+      if (audioCtx) {
+        try { audioCtx.close(); } catch(e){}
+      }
+
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      window.__lastReelBlob = blob;
+      showPreviewURL(url, blob);
+    };
+
+    mediaRecorder.start();
+    recording = true;
+    seconds = 0;
+    updateRecordLabel();
+
+    timerInterval = setInterval(() => {
+      seconds++;
+      updateRecordLabel();
+      if (seconds >= MAX_SECONDS) stopRecording();
+    }, 1000);
+  }
+
+  function stopRecording() {
+    if (!recording) return;
+    recording = false;
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+
+    try {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    } catch (e) {
+      console.warn('Error stopping mediaRecorder:', e);
+    }
+
+    updateRecordLabel();
+  }
+
+  recordBtn && recordBtn.addEventListener('click', () => {
+    if (!recording) startRecording();
+    else stopRecording();
+  });
+
+  // close modal by clicking outside box
+  songModal && songModal.addEventListener('click', (e) => {
+    if (e.target === songModal) songModal.style.display = 'none';
+  });
+
+  // ---------------- photo support ----------------
+  function renderThumbs() {
+    thumbs.innerHTML = '';
+    if (photos.length === 0) {
+      thumbs.innerHTML = '<div style="color:#666; padding:8px;">No photos yet.</div>';
+      return;
+    }
+    photos.forEach((dataUrl, idx) => {
+      const box = document.createElement('div');
+      box.style.width = '92px';
+      box.style.height = '92px';
+      box.style.borderRadius = '8px';
+      box.style.overflow = 'hidden';
+      box.style.position = 'relative';
+      box.style.border = '2px solid #fff';
+      box.style.boxShadow = '0 6px 12px rgba(0,0,0,0.06)';
+
+      const img = document.createElement('img');
+      img.src = dataUrl;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      box.appendChild(img);
+
+      const rem = document.createElement('button');
+      rem.textContent = '✕';
+      rem.style.position = 'absolute';
+      rem.style.top = '4px';
+      rem.style.right = '4px';
+      rem.style.background = 'rgba(0,0,0,0.6)';
+      rem.style.color = 'white';
+      rem.style.border = 'none';
+      rem.style.borderRadius = '50%';
+      rem.style.width = '22px';
+      rem.style.height = '22px';
+      rem.style.cursor = 'pointer';
+      rem.onclick = () => {
+        photos.splice(idx, 1);
+        renderThumbs();
+      };
+
+      box.appendChild(rem);
+      thumbs.appendChild(box);
+    });
+  }
+
+  uploadPhotos && uploadPhotos.addEventListener('change', (ev) => {
+    const files = Array.from(ev.target.files);
+    files.forEach((f) => {
+      // if image -> add as dataURL
+      if (f.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          photos.push(e.target.result);
+          renderThumbs();
+        };
+        reader.readAsDataURL(f);
+      } else {
+        // if video -> capture a thumbnail (first frame) by loading into video element
+        const url = URL.createObjectURL(f);
+        const vid = document.createElement('video');
+        vid.src = url;
+        vid.muted = true;
+        vid.playsInline = true;
+        vid.onloadeddata = () => {
+          // draw first frame to canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = vid.videoWidth || 320;
+          canvas.height = vid.videoHeight || 180;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+          photos.push(canvas.toDataURL('image/jpeg'));
+          renderThumbs();
+          URL.revokeObjectURL(url);
+        };
+      }
+    });
+    uploadPhotos.value = '';
+  });
+
+  // Take photo using camera (simple flow)
+  takePhotoBtn && takePhotoBtn.addEventListener('click', async () => {
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ video: true });
+      // show small capture UI
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.style.display = 'flex';
+      const box = document.createElement('div');
+      box.className = 'box';
+      box.style.maxWidth = '420px';
+      box.innerHTML = `<div style="text-align:center; margin-bottom:8px;"><strong>Take Photo</strong></div>`;
+      const video = document.createElement('video');
+      video.autoplay = true;
+      video.playsInline = true;
+      video.srcObject = s;
+      video.style.width = '100%';
+      box.appendChild(video);
+
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.gap = '8px';
+      row.style.marginTop = '10px';
+      row.style.justifyContent = 'center';
+
+      const capBtn = document.createElement('button');
+      capBtn.className = 'btn btn-add';
+      capBtn.textContent = 'Capture';
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'btn';
+      cancelBtn.textContent = 'Cancel';
+
+      row.appendChild(capBtn);
+      row.appendChild(cancelBtn);
+      box.appendChild(row);
+      modal.appendChild(box);
+      document.body.appendChild(modal);
+
+      capBtn.addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        photos.push(dataUrl);
+        renderThumbs();
+        // cleanup
+        try { s.getTracks().forEach(t=>t.stop()); } catch(e){}
+        document.body.removeChild(modal);
+      });
+
+      cancelBtn.addEventListener('click', () => {
+        try { s.getTracks().forEach(t=>t.stop()); } catch(e){}
+        document.body.removeChild(modal);
+      });
+
+      // close on outside click
+      modal.addEventListener('click', (ev) => { if (ev.target === modal) { try { s.getTracks().forEach(t=>t.stop()); } catch(e){} document.body.removeChild(modal); } });
+
+    } catch (e) {
+      alert('Could not open camera. Allow camera permission.');
+    }
+  });
+
+  // ---------------- make slideshow (photos -> video) ----------------
+  document.getElementById('makeVideoBtn') && document.getElementById('makeVideoBtn').addEventListener('click', async () => {
+    if (photos.length === 0) {
+      alert("Please add at least 1 photo.");
+      return;
+    }
+
+    let songName = selectedSong.textContent !== "None" ? selectedSong.textContent : "";
+
+    const fd = new FormData();
+    photos.forEach((p, i) => fd.append("photo" + i, p));
+    fd.append("count", photos.length);
+    fd.append("song", songName);
+
+    try {
+      const res = await fetch('/make_slideshow', { method: 'POST', body: fd });
+      const text = await res.text();
+
+      if (!res.ok) {
+        let msg = text;
+        try { msg = JSON.parse(text).error || JSON.parse(text).message || text; } catch(e){}
+        throw new Error('Server error: ' + msg);
+      }
+
+      let json;
+      try { json = JSON.parse(text); } catch(e) { throw new Error('Invalid JSON from server'); }
+
+      if (json.ok) {
+        window.location = json.redirect || '/home';
+      } else {
+        throw new Error(json.error || 'Unknown server response');
+      }
+    } catch (err) {
+      alert('Upload error: ' + (err.message || err));
+      console.error('make_slideshow error:', err);
+    }
+  });
+
+  // when page loads, ensure label correct
+  updateRecordLabel();
+  renderThumbs();
+
+  </script>
+
+</body>
+</html>

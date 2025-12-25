@@ -1,0 +1,66 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile - KIDSTA APP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { 
+            font-family: system-ui; 
+            background: #f3f4f6; 
+            margin:0; padding:20px; 
+        }
+        .box { 
+            max-width: 420px; 
+            margin: auto; 
+            background:white; 
+            padding:20px; 
+            border-radius:12px; 
+        }
+        input, textarea {
+            width:100%; 
+            padding:10px; 
+            margin-top:10px;
+            border-radius:8px; 
+            border:1px solid #d1d5db;
+        }
+        button {
+            margin-top:15px; 
+            padding:10px 14px;
+            background:#2563eb; 
+            border:none; 
+            color:white;
+            border-radius:8px; 
+            cursor:pointer;
+        }
+        .back-btn {
+            background:#9ca3af;
+            margin-right:10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Edit Profile</h2>
+
+        <form action="/edit_profile" method="post" enctype="multipart/form-data">
+
+            <label>Profile Name</label>
+            <input type="text" name="display_name" value="{{ user.display_name or '' }}">
+
+            <label>KIDSTA ID</label>
+            <input type="text" name="kidsta_id" value="{{ user.kidsta_id or '' }}">
+
+            <label>Profile Picture</label>
+            <input type="file" name="avatar_file" accept="image/*">
+
+            <button type="button" class="back-btn" onclick="window.location.href='/profile'">
+                Back
+            </button>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html>

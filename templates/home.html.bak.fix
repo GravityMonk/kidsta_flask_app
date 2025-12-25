@@ -1,0 +1,220 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Home - KIDSTA APP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* Light, clean Kidsta home */
+    :root{
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --accent: #6f4cff;
+      --radius:12px;
+      --shadow: 0 10px 30px rgba(16,24,40,0.06);
+      --max-width:920px;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size:16px;
+      color: #0f172a;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);-webkit-font-smoothing:antialiased}
+    .wrap{max-width:var(--max-width);margin:20px auto;padding:12px}
+
+    /* topbar */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:14px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#eef2ff,#fff0fb);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);box-shadow:0 8px 20px rgba(111,76,255,0.06)}
+    .top-actions{display:flex;gap:8px;align-items:center}
+
+    /* icon button */
+    .icon-btn{width:52px;height:44px;border-radius:10px;border:0;background:var(--card);display:inline-flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s}
+    .icon-btn:hover{transform:translateY(-3px)}
+
+    /* layout */
+    .main{display:grid;grid-template-columns:1fr 300px;gap:20px}
+    @media (max-width:900px){ .main{grid-template-columns:1fr} .sidebar{order:2} }
+
+    /* composer */
+    .composer{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:var(--card);box-shadow:var(--shadow);border:1px solid rgba(15,23,42,0.02)}
+    .avatar{width:50px;height:50px;border-radius:999px;background:linear-gradient(90deg,#f0ebff,#eefff6);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent)}
+    .compose-placeholder{flex:1;padding:10px 14px;border-radius:999px;background:transparent;border:1px dashed rgba(15,23,42,0.03);color:var(--muted);cursor:pointer;font-weight:700}
+
+    /* stories */
+    .stories{display:flex;gap:12px;overflow:auto;padding:10px 0;margin:12px 0}
+    .story{width:84px;flex:0 0 84px;text-align:center}
+    .ring{width:72px;height:72px;border-radius:999px;background:linear-gradient(180deg,#fff,#fff);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent);box-shadow:0 10px 24px rgba(2,6,23,0.04)}
+
+    /* post card */
+    .post{background:var(--card);border-radius:12px;overflow:hidden;border:1px solid rgba(15,23,42,0.03);box-shadow:var(--shadow);margin-bottom:18px}
+    .post-top{display:flex;gap:12px;align-items:center;padding:12px}
+    .avatar-sm{width:44px;height:44px;border-radius:999px;background:linear-gradient(90deg,#f0ebff,#eefff6);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent)}
+    .meta{display:flex;flex-direction:column}
+    .name{font-weight:800}
+    .time{font-size:13px;color:var(--muted)}
+
+    .media-large{width:100%;height:420px;background:#000;overflow:hidden;display:block}
+    .media-large img,.media-large video{width:100%;height:100%;object-fit:cover;display:block}
+
+    .media-grid{display:flex;gap:8px;flex-wrap:wrap;padding:12px}
+    .media-thumb{flex:1 1 calc(50% - 8px);min-height:120px;border-radius:10px;overflow:hidden;background:#000}
+
+    .actions{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid rgba(15,23,42,0.02)}
+    .action-row{display:flex;gap:8px;align-items:center}
+    .btn-pill{padding:8px 12px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:800;cursor:pointer}
+    .icon-small{width:44px;height:44px;border-radius:10px;border:0;background:var(--card);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow)}
+
+    .counts{font-weight:800;color:var(--muted);font-size:13px}
+
+    /* sidebar */
+    .sidebar .panel{background:var(--card);border-radius:12px;padding:12px;margin-bottom:12px;border:1px solid rgba(15,23,42,0.02);box-shadow:var(--shadow)}
+    .reel-preview{width:100%;height:240px;border-radius:8px;overflow:hidden;background:#000}
+
+    /* small text */
+    .muted{color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">K</div>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-btn" title="Home" onclick="location.href='{{ url_for('home') }}'">🏠</button>
+        <button class="icon-btn" title="Search" onclick="location.href='{{ url_for('search') }}'">🔍</button>
+        <button class="icon-btn" title="New post" onclick="location.href='/upload'">➕</button>
+        <button class="icon-btn" title="Reels" onclick="location.href='{{ url_for('reels') }}'">🎥</button>
+        <button class="icon-btn" title="Notifications" onclick="location.href='{{ url_for('notifications') }}'">🔔</button>
+        <button class="icon-btn" title="Profile" onclick="location.href='{{ url_for('profile') }}'">👤</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="feed">
+        <!-- composer -->
+        <div class="composer" role="button" onclick="location.href='/upload'">
+          <div class="avatar">{{ (session.get('display_name') or session.get('username') or 'K')[:1] | upper }}</div>
+          <div class="compose-placeholder">Share something...</div>
+        </div>
+
+        <!-- stories -->
+        <div class="stories" aria-hidden>
+          {% for item in (posts|default([]))[:8] %}
+            {% set p = item.post %}
+            <div class="story">
+              <div class="ring">{{ (p.display_name or p.kidsta_id or 'K')[:1] | upper }}</div>
+              <div class="muted">{{ (p.display_name or p.kidsta_id)[:10] }}</div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- posts -->
+        {% for item in (posts|default([])) %}
+          {% set p = item.post %}
+          <article class="post" id="post-{{ p.id }}">
+            <div class="post-top">
+              <div class="avatar-sm">{{ (p.display_name or p.kidsta_id or 'K')[:1] | upper }}</div>
+              <div class="meta">
+                <div class="name">{{ p.display_name or (p.kidsta_id or 'Kidsta') }}</div>
+                <div class="time">{{ p.created_at or '' }}</div>
+              </div>
+            </div>
+
+            {% set media_list = item.media | default([]) %}
+            {% if media_list|length > 0 %}
+              {% set first = media_list[0] %}
+              <div class="media-large" style="padding:0 12px;">
+                {% if first.media_type == 'video' %}
+                  <video controls playsinline><source src="{{ url_for('uploaded_file', filename=first.filename) }}"></video>
+                {% elif first.media_type == 'image' %}
+                  <img src="{{ url_for('uploaded_file', filename=first.filename) }}" alt="image" style="width:100%;height:100%;object-fit:cover;display:block" />
+                {% elif first.media_type == 'audio' %}
+                  <audio controls style="width:100%"><source src="{{ url_for('uploaded_file', filename=first.filename) }}"></audio>
+                {% else %}
+                  <div style="padding:14px;color:var(--muted)">{{ first.filename }}</div>
+                {% endif %}
+              </div>
+
+              {% if media_list|length > 1 %}
+                <div class="media-grid" style="padding:8px 12px 12px 12px">
+                  {% for m in media_list[1:] %}
+                    <div class="media-thumb">
+                      {% if m.media_type == 'image' %}
+                        <img src="{{ url_for('uploaded_file', filename=m.filename) }}" style="width:100%;height:100%;object-fit:cover;">
+                      {% elif m.media_type == 'video' %}
+                        <video muted playsinline style="width:100%;height:100%;object-fit:cover"><source src="{{ url_for('uploaded_file', filename=m.filename) }}"></video>
+                      {% else %}
+                        <div style="padding:12px;color:var(--muted)">{{ m.filename }}</div>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endif %}
+
+            <div class="actions">
+              <div class="action-row">
+                <form action="{{ url_for('like_post', post_id=p.id) }}" method="post" style="display:inline">
+                  <input type="hidden" name="value" value="1">
+                  <button class="btn-pill" type="submit">👍</button>
+                </form>
+
+                <form action="{{ url_for('like_post', post_id=p.id) }}" method="post" style="display:inline">
+                  <input type="hidden" name="value" value="-1">
+                  <button class="btn-pill" type="submit">👎</button>
+                </form>
+
+                <a href="{{ url_for('post_comments', post_id=p.id) }}" title="Comments"><button class="icon-small">💬</button></a>
+
+                <button class="icon-small" title="Share" onclick="sharePost('{{ p.id }}')">🔗</button>
+              </div>
+
+              <div class="counts">👍 {{ item.likes | default(0) }} · 👎 {{ item.dislikes | default(0) }} · 💬 {{ item.comments | default(0) }}</div>
+            </div>
+          </article>
+        {% endfor %}
+      </section>
+
+      <aside class="sidebar">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-weight:800">Reels</div>
+            <a href="{{ url_for('reels') }}" class="muted">View</a>
+          </div>
+          <div class="reel-preview">
+            {% set safe = posts|default([]) %}
+            {% if safe|length>0 and (safe[0].media|default([]))|length>0 and (safe[0].media|default([]))[0].media_type == 'video' %}
+              <video controls playsinline style="width:100%;height:100%;object-fit:cover"><source src="{{ url_for('uploaded_file', filename=(safe[0].media|default([]))[0].filename) }}"></video>
+            {% else %}
+              <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted)">No preview</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="font-weight:800;margin-bottom:8px">Quick actions</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-pill" onclick="navigator.clipboard.writeText(window.location.href).then(()=>alert('Link copied'))">Copy link</button>
+            <a class="btn-pill" href="https://www.facebook.com/sharer/sharer.php?u={{ request.url_root|trim('/') }}" target="_blank" rel="noopener">FB</a>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+<script>
+  // share helper (safe)
+  function sharePost(id){
+    try{
+      const url = window.location.origin + '/post/' + id;
+      if(navigator.share){ navigator.share({ title:'KIDSTA', text:'Check this post', url }).catch(()=>{}); }
+      else navigator.clipboard.writeText(url).then(()=> alert('Link copied'));
+    }catch(e){ console.log(e); }
+  }
+</script>
+</body>
+</html>

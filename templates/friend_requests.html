@@ -1,0 +1,33 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{% extends "layout.html" %}
+{% block content %}
+  <div style="max-width:720px;margin:0 auto">
+    <h2>Friend requests</h2>
+    {% if reqs and reqs|length>0 %}
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+        {% for r in reqs %}
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,0.04)">
+            <div>
+              <div style="font-weight:800">{{ r.display_name }}</div>
+              <div style="color:var(--muted-soft)">@{{ r.kidsta_id }}</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <form action="{{ url_for('respond_friend', request_id=r.id, action='accept') }}" method="post">
+                <button class="btn" type="submit">Accept</button>
+              </form>
+              <form action="{{ url_for('respond_friend', request_id=r.id, action='reject') }}" method="post">
+                <button class="button" type="submit" style="background:transparent;color:#6f4cff;border:1px solid rgba(111,76,255,0.12)">Reject</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color:var(--muted-soft);margin-top:12px">No pending requests.</p>
+    {% endif %}
+    <div style="margin-top:12px">
+      <a href="{{ url_for('profile') }}" class="button" style="background:transparent;color:#6f4cff;border:1px solid rgba(111,76,255,0.12)">Back to profile</a>
+    </div>
+  </div>
+{% endblock %}

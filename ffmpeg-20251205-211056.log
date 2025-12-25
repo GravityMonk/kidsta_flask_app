@@ -1,0 +1,41 @@
+ffmpeg started on 2025-12-05 at 21:10:56
+Report written to "ffmpeg-20251205-211056.log"
+Log level: 48
+Command line:
+ffmpeg -report -v verbose -y -loop 1 -i /Users/zilmil/Desktop/Kidsta_App/static/uploads/20251205153507_test.png -c:v libx264 -t 3 -pix_fmt yuv420p -vf "scale=720:1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2" /Users/zilmil/Desktop/Kidsta_App/static/uploads/tmp_upimg_0_20251205153507.mp4
+ffmpeg version 8.0.1 Copyright (c) 2000-2025 the FFmpeg developers
+  built with Apple clang version 17.0.0 (clang-1700.4.4.1)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.0.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gnutls --enable-gpl --enable-libaom --enable-libaribb24 --enable-libbluray --enable-libdav1d --enable-libharfbuzz --enable-libjxl --enable-libmp3lame --enable-libopus --enable-librav1e --enable-librist --enable-librubberband --enable-libsnappy --enable-libsrt --enable-libssh --enable-libsvtav1 --enable-libtesseract --enable-libtheora --enable-libvidstab --enable-libvmaf --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-lzma --enable-libfontconfig --enable-libfreetype --enable-frei0r --enable-libass --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libspeex --enable-libsoxr --enable-libzmq --enable-libzimg --disable-libjack --disable-indev=jack --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60.  8.100 / 60.  8.100
+  libavcodec     62. 11.100 / 62. 11.100
+  libavformat    62.  3.100 / 62.  3.100
+  libavdevice    62.  1.100 / 62.  1.100
+  libavfilter    11.  4.100 / 11.  4.100
+  libswscale      9.  1.100 /  9.  1.100
+  libswresample   6.  1.100 /  6.  1.100
+Splitting the commandline.
+Reading option '-report' ... matched as option 'report' (generate a report) with argument '1'.
+Reading option '-v' ... matched as option 'v' (set logging level) with argument 'verbose'.
+Reading option '-y' ... matched as option 'y' (overwrite output files) with argument '1'.
+Reading option '-loop' ... matched as AVOption 'loop' with argument '1'.
+Reading option '-i' ... matched as input url with argument '/Users/zilmil/Desktop/Kidsta_App/static/uploads/20251205153507_test.png'.
+Reading option '-c:v' ... matched as option 'c' (select encoder/decoder ('copy' to copy stream without reencoding)) with argument 'libx264'.
+Reading option '-t' ... matched as option 't' (stop transcoding after specified duration) with argument '3'.
+Reading option '-pix_fmt' ... matched as option 'pix_fmt' (set pixel format) with argument 'yuv420p'.
+Reading option '-vf' ... matched as option 'vf' (alias for -filter:v (apply filters to video streams)) with argument 'scale=720:1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2'.
+Reading option '/Users/zilmil/Desktop/Kidsta_App/static/uploads/tmp_upimg_0_20251205153507.mp4' ... matched as output url.
+Finished splitting the commandline.
+Parsing a group of options: global .
+Applying option report (generate a report) with argument 1.
+Applying option v (set logging level) with argument verbose.
+Applying option y (overwrite output files) with argument 1.
+Successfully parsed a group of options.
+Parsing a group of options: input url /Users/zilmil/Desktop/Kidsta_App/static/uploads/20251205153507_test.png.
+Successfully parsed a group of options.
+Opening an input file: /Users/zilmil/Desktop/Kidsta_App/static/uploads/20251205153507_test.png.
+[AVFormatContext @ 0x158731dc0] Opening '/Users/zilmil/Desktop/Kidsta_App/static/uploads/20251205153507_test.png' for reading
+[file @ 0x158732140] Setting default whitelist 'file,crypto,data'
+[png_pipe @ 0x158731dc0] Format png_pipe probed with size=2048 and score=99
+[png_pipe @ 0x158731dc0] Before avformat_find_stream_info() pos: 0 bytes read:67 seeks:0 nb_streams:1
+Failed to reallocate parser buffer to -2147483634
+Failed to reallocate parser buffer to -2147483634

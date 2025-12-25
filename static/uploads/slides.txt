@@ -1,0 +1,7 @@
+file '/Users/zilmil/Desktop/Kidsta_App/static/uploads/slide_0_1764223771.391413.jpg'
+duration 3
+file '/Users/zilmil/Desktop/Kidsta_App/static/uploads/slide_1_1764223771.392732.jpg'
+duration 3
+file '/Users/zilmil/Desktop/Kidsta_App/static/uploads/slide_2_1764223771.393888.jpg'
+duration 3
+file '/Users/zilmil/Desktop/Kidsta_App/static/uploads/slide_2_1764223771.393888.jpg'

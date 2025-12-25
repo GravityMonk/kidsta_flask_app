@@ -1,0 +1,41 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{% extends "layout.html" %}
+{% block content %}
+  <div style="max-width:720px;margin:0 auto">
+    <h2>Comments</h2>
+
+    <div style="background:#fff;padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.04);margin-bottom:12px">
+      <div style="font-weight:800">{{ post.display_name }}'s post</div>
+      <div style="color:var(--muted-soft);font-size:13px">{{ (post.created_at or '')[:19] }}</div>
+      <div style="margin-top:8px">{{ post.caption }}</div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <strong>Likes:</strong> {{ likes }} &nbsp;&nbsp; <strong>Dislikes:</strong> {{ dislikes }}
+    </div>
+
+    <form method="post" style="display:flex;gap:8px;margin-bottom:12px">
+      <input name="text" placeholder="Write a comment..." style="flex:1;padding:8px;border-radius:8px">
+      <button class="btn" type="submit">Post</button>
+    </form>
+
+    {% if comments and comments|length > 0 %}
+      <div style="display:flex;flex-direction:column;gap:10px">
+        {% for c in comments %}
+          <div style="background:#fff;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.04)">
+            <div style="font-weight:800">{{ c.display_name }}</div>
+            <div style="color:var(--muted-soft);font-size:12px">{{ c.created_at[:19] }}</div>
+            <div style="margin-top:6px">{{ c.text }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color:var(--muted-soft)">No comments yet. Be first!</p>
+    {% endif %}
+
+    <div style="margin-top:12px">
+      <a href="{{ url_for('home') }}" class="button" style="background:transparent;color:#6f4cff;border:1px solid rgba(111,76,255,0.12)">Back to feed</a>
+    </div>
+  </div>
+{% endblock %}

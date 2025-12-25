@@ -1,0 +1,18 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{% extends "layout.html" %}
+{% block content %}
+  <div style="max-width:720px;margin:0 auto">
+    <h2>Edit post</h2>
+    <form method="post" enctype="multipart/form-data" style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+      <label>Caption</label>
+      <textarea name="caption" rows="3" style="width:100%;padding:8px">{{ post.caption }}</textarea>
+      <label>Replace media (optional)</label>
+      <input type="file" name="media" accept="image/*,video/*">
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button class="btn" type="submit">Save</button>
+        <a href="{{ url_for('profile') }}" class="button" style="background:transparent;color:#6f4cff;border:1px solid rgba(111,76,255,0.12)">Cancel</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

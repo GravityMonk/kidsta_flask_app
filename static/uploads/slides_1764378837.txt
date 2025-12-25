@@ -1,0 +1,11 @@
+file '/Users/zilmil/Desktop/Kidsta_App/static/uploads/slide_0_1764378837.jpg'
+duration 3
+file '/Users/zilmil/Desktop/Kidsta_App/static/uploads/slide_1_1764378837.jpg'
+duration 3
+file '/Users/zilmil/Desktop/Kidsta_App/static/uploads/slide_2_1764378837.jpg'
+duration 3
+file '/Users/zilmil/Desktop/Kidsta_App/static/uploads/slide_3_1764378837.jpg'
+duration 3
+file '/Users/zilmil/Desktop/Kidsta_App/static/uploads/slide_4_1764378837.jpg'
+duration 3
+file '/Users/zilmil/Desktop/Kidsta_App/static/uploads/slide_4_1764378837.jpg'

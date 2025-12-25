@@ -1,0 +1,301 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Reels - KIDSTA APP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script>
+  // elements
+  const addSongBtn = document.getElementById('addSongBtn');
+  const songModal = document.getElementById('songModal');
+  const closeModal = document.getElementById('closeModal');
+  const openLibrary = document.getElementById('openLibrary');
+  const saveSongBtn = document.getElementById('saveSongBtn');
+  const songInput = document.getElementById('songInput');
+  const selectedSong = document.getElementById('selectedSong');
+  const recordBtn = document.getElementById('recordBtn');
+  const previewArea = document.getElementById('previewArea');
+  const previewText = document.getElementById('previewText');
+
+  // state
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let recording = false;
+  let stream = null;
+  let timerInterval = null;
+  let seconds = 0;
+  const MAX_SECONDS = 60;
+
+  // modal controls (same as before)
+  addSongBtn.addEventListener('click', () => { songModal.style.display = 'flex'; });
+  closeModal.addEventListener('click', () => { songModal.style.display = 'none'; });
+  openLibrary.addEventListener('click', () => { window.open('/audio-library', '_blank'); });
+  saveSongBtn.addEventListener('click', () => {
+    const v = songInput.value.trim();
+    if (!v) { alert('Please type the song filename (example: Hush_Now_My_Baby_1.mp3)'); return; }
+    selectedSong.textContent = v;
+    songModal.style.display = 'none';
+    songInput.value = '';
+  });
+  songModal.addEventListener('click', (e) => { if (e.target === songModal) songModal.style.display = 'none'; });
+
+  // helper: show timer on record button
+  function updateRecordLabel() {
+    if (!recording) {
+      recordBtn.textContent = '● RECORD';
+      recordBtn.style.fontSize = '16px';
+    } else {
+      const mm = String(Math.floor(seconds / 60)).padStart(2,'0');
+      const ss = String(seconds % 60).padStart(2,'0');
+      recordBtn.textContent = `${mm}:${ss}`;
+      recordBtn.style.fontSize = '18px';
+    }
+  }
+
+  // helper: create video element for preview
+  function showPreviewURL(url) {
+    previewArea.innerHTML = '';
+    const video = document.createElement('video');
+    video.controls = true;
+    video.src = url;
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.objectFit = 'contain';
+    previewArea.appendChild(video);
+
+    // also add an upload button below video
+    const uploadWrap = document.createElement('div');
+    uploadWrap.style.position = 'absolute';
+    uploadWrap.style.bottom = '12px';
+    uploadWrap.style.left = '50%';
+    uploadWrap.style.transform = 'translateX(-50%)';
+    uploadWrap.style.zIndex = '10';
+    previewArea.appendChild(uploadWrap);
+
+    const uploadBtn = document.createElement('button');
+    uploadBtn.textContent = 'UPLOAD →';
+    uploadBtn.className = 'btn btn-add';
+    uploadBtn.style.padding = '10px 20px';
+    uploadBtn.onclick = () => uploadReelBlob(url);
+    uploadWrap.appendChild(uploadBtn);
+  }
+
+  // upload function: send to /upload_reel
+  async function uploadReelBlob(videoUrlOrBlob) {
+    // get blob
+    let blob;
+    if (videoUrlOrBlob instanceof Blob) blob = videoUrlOrBlob;
+    else {
+      const resp = await fetch(videoUrlOrBlob);
+      blob = await resp.blob();
+    }
+
+    // prepare form
+    const fd = new FormData();
+    fd.append('video', blob, 'reel_video.webm'); // server will save with reel_ prefix
+    const songName = selectedSong.textContent && selectedSong.textContent !== 'None' ? selectedSong.textContent : '';
+    fd.append('song', songName);
+
+    // disable UI while upload
+    const oldText = recordBtn.textContent;
+    recordBtn.disabled = true;
+    recordBtn.style.opacity = '0.6';
+
+    try {
+      const res = await fetch('/upload_reel', { method: 'POST', body: fd });
+      const j = await res.json();
+      if (j.ok) {
+        // redirect to home (server gives URL)
+        window.location = j.redirect || '/home';
+      } else {
+        alert('Upload failed: ' + (j.message || 'Server error'));
+        recordBtn.disabled = false;
+        recordBtn.style.opacity = '1';
+        recordBtn.textContent = oldText;
+      }
+    } catch (e) {
+      alert('Network error during upload');
+      recordBtn.disabled = false;
+      recordBtn.style.opacity = '1';
+      recordBtn.textContent = oldText;
+    }
+  }
+
+  // start recording
+  async function startRecording() {
+    try {
+      // ask permission for camera and mic
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    } catch (e) {
+      alert('Camera and mic permission needed to record. Please allow them in the browser.');
+      return;
+    }
+
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp8,opus' });
+    mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      // stop all tracks
+      try { stream.getTracks().forEach(t => t.stop()); } catch(e){}
+
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      showPreviewURL(url);
+
+      // also keep blob in window so immediate upload possible without re-fetch
+      window.__lastReelBlob = blob;
+    };
+
+    // show live camera in preview while recording
+    previewArea.innerHTML = '';
+    const liveVideo = document.createElement('video');
+    liveVideo.autoplay = true;
+    liveVideo.muted = true;
+    liveVideo.playsInline = true;
+    liveVideo.srcObject = stream;
+    liveVideo.style.width = '100%';
+    liveVideo.style.height = '100%';
+    liveVideo.style.objectFit = 'cover';
+    previewArea.appendChild(liveVideo);
+
+    mediaRecorder.start();
+    recording = true;
+    seconds = 0;
+    updateRecordLabel();
+
+    // timer update
+    timerInterval = setInterval(() => {
+      seconds++;
+      updateRecordLabel();
+      if (seconds >= MAX_SECONDS) {
+        stopRecording();
+      }
+    }, 1000);
+  }
+
+  // stop recording
+  function stopRecording() {
+    if (!recording) return;
+    recording = false;
+    updateRecordLabel();
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    try { mediaRecorder && mediaRecorder.state !== 'inactive' && mediaRecorder.stop(); } catch(e){}
+  }
+
+  // click handler for big record button
+  recordBtn.addEventListener('click', () => {
+    if (!recording) {
+      startRecording();
+    } else {
+      stopRecording();
+    }
+  });
+
+  // when user clicks the upload button above preview, we use the blob we saved
+  // and call uploadReelBlob(window.__lastReelBlob)
+</script>
+
+</head>
+<body>
+
+  <div class="topbar">
+    <div><strong>KIDSTA APP</strong></div>
+    <div>
+      <a href="/home" style="color:white; text-decoration:none; font-weight:600; margin-right:12px;">Home</a>
+      <a href="/profile" style="color:white; text-decoration:none;">Profile</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h3 style="margin:0 0 8px 0;">Create a Reel</h3>
+
+    <!-- big preview area -->
+    <div class="video-preview" id="previewArea">
+      <p id="previewText">No recording yet. Press the round button to record.</p>
+    </div>
+
+    <!-- controls -->
+    <div class="controls">
+      <button class="btn btn-add" id="addSongBtn">➕ Add Song</button>
+
+      <div style="text-align:right">
+        <div style="font-size:12px; color:var(--muted)">Max 60 seconds</div>
+        <div style="font-size:13px; margin-top:6px; font-weight:600">Selected: <span id="selectedSong">None</span></div>
+      </div>
+    </div>
+
+    <!-- big round record -->
+    <div class="record-wrap">
+      <button class="record-button" id="recordBtn">● RECORD</button>
+    </div>
+    <div class="small-note">Tap RECORD to start. Tap again to stop.</div>
+  </div>
+
+  <!-- simple modal: we will use this to open audio library -->
+  <div class="modal" id="songModal">
+    <div class="box">
+      <h4>Select a song</h4>
+      <p>For now, open the audio library, pick a song, and copy its filename here.</p>
+      <button class="btn" id="openLibrary">Open audio library</button>
+      <div style="margin-top:10px;">
+        <input id="songInput" placeholder="Type song filename (e.g. my_song.mp3)" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ddd" />
+      </div>
+      <div style="display:flex; gap:8px; justify-content:center; margin-top:10px;">
+        <button class="btn btn-add" id="saveSongBtn">Save</button>
+        <button class="btn" id="closeModal">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // very simple interactive behavior for now
+    const addSongBtn = document.getElementById('addSongBtn');
+    const songModal = document.getElementById('songModal');
+    const closeModal = document.getElementById('closeModal');
+    const openLibrary = document.getElementById('openLibrary');
+    const saveSongBtn = document.getElementById('saveSongBtn');
+    const songInput = document.getElementById('songInput');
+    const selectedSong = document.getElementById('selectedSong');
+    const recordBtn = document.getElementById('recordBtn');
+    const previewArea = document.getElementById('previewArea');
+    const previewText = document.getElementById('previewText');
+
+    addSongBtn.addEventListener('click', () => {
+      songModal.style.display = 'flex';
+    });
+    closeModal.addEventListener('click', () => {
+      songModal.style.display = 'none';
+    });
+
+    openLibrary.addEventListener('click', () => {
+      // open the audio library page in a new tab (simple for now)
+      window.open('/audio-library', '_blank');
+    });
+
+    saveSongBtn.addEventListener('click', () => {
+      const v = songInput.value.trim();
+      if (!v) {
+        alert('Please type the song filename you want (example: Hush_Now_My_Baby_1.mp3)');
+        return;
+      }
+      selectedSong.textContent = v;
+      songModal.style.display = 'none';
+      songInput.value = '';
+    });
+
+    // Record button will be activated later.
+    recordBtn.addEventListener('click', () => {
+      alert('Recording will be added in the next step. Say "next" when you are ready.');
+    });
+
+    // close modal if user clicks outside
+    songModal.addEventListener('click', (e) => {
+      if (e.target === songModal) songModal.style.display = 'none';
+    });
+  </script>
+
+</body>
+</html>

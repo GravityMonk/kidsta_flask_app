@@ -1,0 +1,182 @@
+/* ---------- Global basics ---------- */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: #f3f4f6;
+    margin: 0;
+    padding: 0;
+    color: #111827;
+}
+
+/* ---------- Top bar (navbar) ---------- */
+.topbar {
+    background: #4a90e2;
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.topbar-title {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.topbar-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.topbar-links a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Page wrapper ---------- */
+.page-wrapper {
+    max-width: 640px;
+    margin: 16px auto 24px;
+    padding: 0 12px;
+}
+
+/* ---------- Cards ---------- */
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 14px;
+}
+
+.card-header {
+    margin-bottom: 6px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.card-subtitle {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* ---------- Buttons & links ---------- */
+.btn {
+    border-radius: 999px;
+    border: none;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #43a047;
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+/* Small tags / counters */
+.badge-muted {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* ---------- Media ---------- */
+.post-media img {
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.post-media video,
+.post-media audio {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.pdf-link {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+/* ---------- Special: new-post bar ---------- */
+.new-post-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* ---------- Logout modal ---------- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 16px 18px 14px;
+    max-width: 320px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    text-align: center;
+}
+
+.modal-box h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+.modal-box p {
+    margin: 0 0 14px;
+    font-size: 13px;
+    color: #555;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+    .page-wrapper {
+        padding: 0 8px;
+    }
+    .topbar {
+        padding: 10px 10px;
+    }
+}

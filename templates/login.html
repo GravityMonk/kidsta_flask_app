@@ -1,0 +1,26 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{% extends "layout.html" %}
+{% block content %}
+  <div style="max-width:520px;margin:0 auto;">
+    <div style="background:linear-gradient(180deg,#ffffff,#fbfdff);padding:20px;border-radius:12px;box-shadow:0 8px 20px rgba(15,23,42,0.06)">
+      <h2 style="margin:0 0 8px 0;color:#6f4cff;font-size:22px">Welcome to Kidsta</h2>
+      <div style="color:#64748b;font-size:13px;margin-bottom:12px">Sign in with username, password and age.</div>
+
+      <form method="post" style="display:flex;flex-direction:column;gap:10px;">
+        <label style="font-size:13px;color:#64748b">Username</label>
+        <input name="username" type="text" placeholder="choose a username" required style="padding:10px;border-radius:10px;border:1px solid rgba(15,23,42,0.06);font-weight:700">
+        <label style="font-size:13px;color:#64748b">Password</label>
+        <input name="password" type="password" placeholder="a secret" required style="padding:10px;border-radius:10px;border:1px solid rgba(15,23,42,0.06);font-weight:700">
+        <label style="font-size:13px;color:#64748b">Age</label>
+        <input name="age" type="number" min="7" max="18" placeholder="e.g. 10" required style="padding:10px;border-radius:10px;border:1px solid rgba(15,23,42,0.06);font-weight:700">
+        <button class="btn" type="submit" style="margin-top:8px;font-size:16px;padding:12px">Continue</button>
+      </form>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <a href="{{ url_for('about') }}" class="button" style="background:transparent;color:#6f4cff;padding:6px 10px;border-radius:8px;border:1px solid rgba(111,76,255,0.12)">About</a>
+        <span style="color:var(--muted-soft);font-weight:600;padding:6px 10px;border-radius:8px;">Forgot?</span>
+      </div>
+    </div>
+  </div>
+{% endblock %}

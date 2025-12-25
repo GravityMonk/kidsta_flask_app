@@ -1,0 +1,96 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Users</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            padding: 20px;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .user-card {
+            background: white;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid #ddd;
+        }
+        .user-info {
+            flex-grow: 1;
+        }
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .add-btn { background: #4CAF50; color: white; }
+        .pending-btn { background: gray; color: white; cursor: not-allowed; }
+        .friend-btn { background: #2196F3; color: white; cursor: not-allowed; }
+        .block-btn { background: #ff4444; color: white; }
+        .report-btn { background: #ff8800; color: white; }
+    </style>
+</head>
+
+<body>
+
+    <h2>Search Users</h2>
+
+    <!-- Search box -->
+    <form method="get" class="search-box">
+        <input type="text" name="q" placeholder="Enter Kidsta ID" value="{{ q }}" required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if results|length == 0 %}
+        <p>No users found.</p>
+    {% endif %}
+
+    <!-- User list -->
+    {% for r in results %}
+    <div class="user-card">
+
+        <div class="user-info">
+            <strong>{{ r.display_name or "No Name" }}</strong><br>
+            <small>ID: {{ r.kidsta_id }}</small>
+        </div>
+
+        <!-- FRIEND STATUS BUTTONS -->
+        {% if r.id in friend_ids %}
+            <button class="friend-btn" disabled>Friends</button>
+
+        {% elif r.id in pending_ids %}
+            <button class="pending-btn" disabled>Pending</button>
+
+        {% else %}
+            <form action="/send_friend/{{ user_id }}/{{ r.id }}" method="post">
+                <button class="add-btn" type="submit">Add Friend</button>
+            </form>
+        {% endif %}
+
+        <!-- REPORT USER -->
+        <form action="/report_user/{{ r.id }}" method="post" style="display:inline;">
+            <button class="report-btn" type="submit">Report</button>
+        </form>
+
+        <!-- BLOCK USER -->
+        <form action="/block_user/{{ r.id }}" method="post" style="display:inline;">
+            <button class="block-btn" type="submit">Block</button>
+        </form>
+
+    </div>
+    {% endfor %}
+
+    <br>
+    <a href="/home">⬅ Back to Home</a>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- LAYOUT TEST: v1 -->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>{{ title or "Kidsta" }}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <style>
+    /* LIGHT SIMPLE GLOBALS – DOESN'T OVERRIDE CHILD PAGES */
+    :root{
+      --accent1:#6f4cff;
+      --accent2:#23c7ad;
+      --muted-soft:#64748b;
+    }
+
+    body{
+      margin:0;
+      font-family:Poppins,Arial,sans-serif;
+
+      /* VERY SIMPLE BRIGHT BACKGROUND (won’t override create_post) */
+      background:linear-gradient(135deg,#fff2ff,#eafff7);
+      min-height:100vh;
+      padding:20px;
+    }
+
+    .container{
+      width:100%;
+      max-width:880px;
+      margin:0 auto;
+
+      /* Removed forced background and heavy box */
+      background:transparent;
+      padding:0;
+    }
+
+    /* Header stays same clean look */
+    header.top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .logo{
+      width:50px;
+      height:50px;
+      border-radius:14px;
+      background:linear-gradient(135deg,var(--accent2),var(--accent1));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-weight:900;
+      font-size:26px;
+    }
+
+    .brand-title .name{
+      font-weight:900;
+      color:var(--accent1);
+      font-size:18px;
+    }
+
+    .brand-title .tag{
+      color:var(--muted-soft);
+      font-size:12px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+
+    a.button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:white;
+      color:var(--accent1);
+      font-weight:700;
+      text-decoration:none;
+    }
+
+    /* MAIN CONTENT BOX – super simple */
+    .main{
+      margin-top:10px;
+      padding:0;
+      background:transparent;
+      box-shadow:none;
+    }
+
+    /* Flash messages unchanged */
+    .msg{
+      padding:12px;
+      border-radius:12px;
+      font-weight:700;
+      margin-bottom:12px;
+      text-align:center;
+    }
+    .success{background:#e7fff7;color:#0f766e}
+    .danger{background:#ffecec;color:#b91c1c}
+    .info{background:#eaf2ff;color:#1d4ed8}
+  </style>
+
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="top">
+      <div class="brand">
+        <div class="logo">K</div>
+        <div class="brand-title">
+          <div class="name">Kidsta</div>
+          <div class="tag">Safe social world for kids</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        {% if session.get('user_id') %}
+          <a href="{{ url_for('home') }}" class="button">Home</a>
+          <a href="{{ url_for('upload_post') }}" class="button">＋ Post</a>
+          <a href="{{ url_for('profile') }}" class="button">Profile</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="button">Login</a>
+        {% endif %}
+      </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for cat,msg in messages %}
+          <div class="msg {{cat}}">{{msg}}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="main">
+      {% block content %}{% endblock %}
+    </div>
+
+  </div>
+</body>
+</html>

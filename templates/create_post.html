@@ -1,0 +1,212 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- CREATE_POST TEST: v1 -->
+<div style="background:#fff1f2;padding:6px;border-radius:6px;margin-bottom:8px;">TEMPLATE: create_post.html loaded</div>
+
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+  :root{
+    --pink:#ff3fa6;
+    --mint:#23d6a6;
+    --bg:#fff8ff;
+    --card:#ffffff;
+    --r:14px;
+    --shadow:0 10px 30px rgba(0,0,0,0.06);
+  }
+
+  .wrap{
+    max-width:740px;
+    margin:22px auto;
+    padding:18px;
+  }
+
+  .card{
+    background:linear-gradient(180deg,#fff,#fffaf6);
+    border-radius:var(--r);
+    padding:16px;
+    box-shadow:var(--shadow);
+  }
+
+  textarea{
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(0,0,0,0.06);
+    resize:none;
+    font-size:15px;
+    background:#fff;
+  }
+
+  .picker{
+    margin-top:12px;
+    padding:12px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    cursor:pointer;
+    border:2px dashed rgba(0,0,0,0.04);
+    background:linear-gradient(90deg,#ffeef9,#e9fff6);
+  }
+
+  .thumb{
+    width:92px;
+    height:72px;
+    border-radius:10px;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    font-size:12px;
+    color:#777;
+    border:1px solid rgba(0,0,0,0.04);
+  }
+
+  #preview{
+    margin-top:12px;
+    border-radius:12px;
+    padding:8px;
+    min-height:120px;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:#fff;
+    border:1px solid rgba(0,0,0,0.04);
+    overflow:hidden;
+  }
+
+  .row{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+  }
+
+  .btn{
+    padding:10px 16px;
+    border-radius:12px;
+    border:none;
+    cursor:pointer;
+    font-weight:800;
+    color:#fff;
+    background:linear-gradient(90deg,var(--pink),var(--mint));
+  }
+
+  .back{
+    padding:10px 16px;
+    border-radius:12px;
+    border:1px solid rgba(0,0,0,0.06);
+    text-decoration:none;
+    color:#444;
+    background:#fff;
+    display:inline-flex;
+    align-items:center;
+  }
+
+  @media(max-width:520px){
+    .thumb{ width:72px; height:56px; }
+    .row{ flex-direction:column; }
+  }
+</style>
+
+<div class="wrap">
+  <div class="card">
+    <form id="form" method="post" enctype="multipart/form-data">
+      <textarea id="caption" name="caption" rows="2" placeholder="Write..."></textarea>
+
+      <div id="picker" class="picker" role="button" tabindex="0">
+        <input id="file" name="media" type="file" accept="image/*,video/*" style="display:none">
+        <div style="font-weight:800;color:var(--pink);">Select</div>
+        <div id="thumb" class="thumb">None</div>
+      </div>
+
+      <div id="preview"></div>
+
+      <div class="row">
+        <button class="btn" type="submit">Post</button>
+        <a class="back" href="{{ url_for('home', user_id=request.args.get('user_id','')) }}">Back</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const MAX = 20 * 1024 * 1024; // 20 MB
+    const picker = document.getElementById('picker');
+    const file = document.getElementById('file');
+    const thumb = document.getElementById('thumb');
+    const preview = document.getElementById('preview');
+    const form = document.getElementById('form');
+    const caption = document.getElementById('caption');
+
+    picker.addEventListener('click', ()=> file.click());
+    picker.addEventListener('keydown', (e)=> { if(e.key==='Enter' || e.key===' ') file.click(); });
+
+    file.addEventListener('change', () => {
+      const f = file.files[0];
+      preview.innerHTML = '';
+      if(!f){
+        thumb.textContent = 'None';
+        preview.style.display = 'none';
+        return;
+      }
+
+      if(f.size > MAX){
+        alert('File too large. Use < 20 MB.');
+        file.value = '';
+        thumb.textContent = 'None';
+        preview.style.display = 'none';
+        return;
+      }
+
+      const url = URL.createObjectURL(f);
+      thumb.innerHTML = '';
+
+      if(f.type.startsWith('image/')){
+        const img = document.createElement('img');
+        img.src = url;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        thumb.appendChild(img);
+
+        const big = document.createElement('img');
+        big.src = url;
+        big.style.maxWidth = '100%';
+        big.style.maxHeight = '380px';
+        big.style.borderRadius = '10px';
+        preview.appendChild(big);
+      } else if(f.type.startsWith('video/')){
+        thumb.textContent = f.name;
+        const v = document.createElement('video');
+        v.src = url;
+        v.controls = true;
+        v.style.maxWidth = '100%';
+        v.style.maxHeight = '380px';
+        v.style.borderRadius = '10px';
+        preview.appendChild(v);
+      } else {
+        thumb.textContent = f.name;
+      }
+
+      preview.style.display = 'flex';
+    });
+
+    form.addEventListener('submit', (e)=>{
+      const f = file.files[0];
+      if(!f && !caption.value.trim()){
+        e.preventDefault();
+      } else if(f && f.size > MAX){
+        e.preventDefault();
+        alert('File too large. Use < 20 MB.');
+      }
+      // otherwise allow normal POST (server handles upload)
+    });
+  })();
+</script>
+
+{% endblock %}

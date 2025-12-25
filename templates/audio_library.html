@@ -1,0 +1,50 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KIDSTA APP - Audio Library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background:#f3f4f6; margin:0; padding:0;">
+
+    <div style="background:#4a90e2; color:white; padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
+        <div><strong>KIDSTA APP Audio Library</strong></div>
+        <div>
+            <a href="/home" style="color:white; text-decoration:none; font-size:14px; margin-left:10px;">Home</a>
+            <a href="/reels" style="color:white; text-decoration:none; font-size:14px; margin-left:10px;">Back to Reels</a>
+        </div>
+    </div>
+
+    <div style="max-width:640px; margin:16px auto 24px; padding:0 12px;">
+        <h2 style="font-size:20px; margin-bottom:8px;">🎵 Choose a song for your Reel</h2>
+        <p style="font-size:13px; color:#4b5563; margin-top:0;">
+            Tap play to listen, and tap “Use this song” to send it to the Reels screen.
+        </p>
+
+        {% if files|length == 0 %}
+            <p>No songs found yet. Please add some files in <code>static/audio_library</code>.</p>
+        {% endif %}
+
+        {% for file in files %}
+            <div style="background:white; border-radius:12px; padding:10px 12px; margin-bottom:10px; border:1px solid #e5e7eb;">
+                <div style="font-size:14px; font-weight:500; margin-bottom:4px;">
+                    {{ file }}
+                </div>
+                <audio controls style="width:100%; margin-bottom:6px;">
+                    <source src="{{ url_for('uploaded_audio', filename=file) }}">
+                    Your browser does not support audio.
+                </audio>
+                <div style="text-align:right;">
+                    <!-- Yahan se hum reels page ko song ka naam bhej rahe hain -->
+                    <a href="{{ url_for('reels') }}?song={{ file }}"
+                       style="display:inline-block; padding:6px 10px; font-size:12px; border-radius:999px; background:#4CAF50; color:white; text-decoration:none;">
+                        Use this song for Reel
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

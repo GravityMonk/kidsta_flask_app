@@ -1,0 +1,17 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{% extends "layout.html" %}
+{% block content %}
+  <div style="max-width:520px;margin:0 auto;">
+    <h2>Create profile</h2>
+    <form method="post" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+      <label>Display name</label>
+      <input name="display_name" type="text" required placeholder="e.g. Mimi" style="padding:10px;border-radius:8px">
+      <label>Kidsta ID</label>
+      <input name="kidsta_id" type="text" required placeholder="choose id (no spaces)" style="padding:10px;border-radius:8px">
+      <label>Avatar (optional)</label>
+      <input name="avatar" type="file" accept="image/*">
+      <button class="btn" type="submit" style="margin-top:8px">Save profile</button>
+    </form>
+  </div>
+{% endblock %}

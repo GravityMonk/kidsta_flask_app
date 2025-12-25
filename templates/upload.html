@@ -1,0 +1,420 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Upload - KIDSTA APP</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      /* base colors */
+      --bg-grad: linear-gradient(135deg,#fbf7ff,#f2fff8);
+      --card-light: linear-gradient(180deg,#ffffff,#fffaf6);
+      --card-dark: linear-gradient(180deg, rgba(8,12,20,0.65), rgba(6,10,16,0.55));
+      --muted-light: #42515f;
+      --muted-dark: #9aa4b2;
+      --accent-1: #ff3fa6;
+      --accent-2: #23d6a6;
+      --glass: rgba(255,255,255,0.06);
+      --radius:14px;
+      --font-size:16px; /* base increased */
+      --shadow-strong: 0 20px 60px rgba(2,6,23,0.55);
+    }
+
+    /* Dark mode variables */
+    body.dark{
+      --bg-grad: linear-gradient(135deg,#071021,#041217);
+      --muted: var(--muted-dark);
+      --card: var(--card-dark);
+      color: #e6eef6;
+    }
+    /* Light mode defaults */
+    body:not(.dark){
+      --muted: var(--muted-light);
+      --card: var(--card-light);
+      color: #07121a;
+    }
+
+    /* theme swatches */
+    .theme-pink { --accent-1:#ff3fa6; --accent-2:#23d6a6; }
+    .theme-sunset { --accent-1:#ff7aa2; --accent-2:#ffd36b; }
+    .theme-neon { --accent-1:#7bffb2; --accent-2:#7ad1ff; }
+
+    html,body{
+      height:100%; margin:0;
+      font-family:Inter,system-ui,Arial,Helvetica,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      background:var(--bg-grad);
+      -webkit-font-smoothing:antialiased;
+      font-size:var(--font-size);
+    }
+
+    /* container: center and give breathing room */
+    .wrap{
+      max-width:980px;
+      margin:36px auto;
+      padding:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* card: stronger contrast and bigger feel */
+    .card{
+      width: clamp(380px, 46vw, 820px);
+      max-width:94vw;
+      aspect-ratio: 1 / 1;
+      min-height:420px;
+      max-height:86vh;
+
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border-radius:var(--radius);
+      border:1px solid rgba(0,0,0,0.06);
+      box-shadow: var(--shadow-strong);
+
+      padding:18px;
+      position:relative;
+      overflow:auto;
+
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    /* prominent animated accent */
+    .accent-band{
+      position:absolute; left:-28%; right:-28%;
+      height:240px; top:-48px;
+      background: linear-gradient(90deg, rgba(255,62,150,0.14), rgba(35,214,166,0.12), rgba(255,210,102,0.08));
+      filter:blur(44px);
+      transform:rotate(-10deg);
+      animation: float 12s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes float{ 0%{transform:rotate(-10deg) translateX(0)}50%{transform:rotate(-10deg) translateX(6%)}100%{transform:rotate(-10deg) translateX(0)} }
+
+    /* bigger inputs for clarity */
+    textarea{
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,0.06);
+      background:transparent;
+      color:inherit;
+      resize:none;
+      font-size:17px;
+      line-height:1.4;
+      min-height:62px;
+    }
+
+    /* file picker: larger and clearer */
+    .picker{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px;
+      border-radius:12px;
+      border:2px dashed rgba(0,0,0,0.06);
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      cursor:pointer;
+      transition: transform .12s, box-shadow .12s;
+    }
+    .picker:hover{ transform: translateY(-3px); box-shadow: 0 20px 40px rgba(2,6,23,0.35); }
+
+    /* thumb bigger so it's visible */
+    .thumb{
+      width:128px;
+      height:96px;
+      border-radius:10px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(255,255,255,0.02));
+      display:flex; align-items:center; justify-content:center;
+      font-size:13px; color:var(--muted);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.04);
+    }
+
+    /* preview: larger and clearly separated */
+    #preview{
+      flex:1 1 auto;
+      display:none;
+      padding:12px;
+      min-height:220px;
+      max-height: calc(100% - 300px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.04);
+      overflow:auto;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* controls bigger, easier to hit */
+    .controls{
+      flex:0 0 auto;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .btn{
+      padding:12px 18px;
+      border-radius:14px;
+      border:none;
+      cursor:pointer;
+      font-weight:900;
+      font-size:16px;
+      color:#07121a;
+      background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+      box-shadow: 0 14px 36px rgba(2,6,23,0.5);
+      transition: transform .12s, box-shadow .12s;
+    }
+    .btn:hover{ transform: translateY(-3px); box-shadow: 0 18px 46px rgba(2,6,23,0.55); }
+    .btn:active{ transform: translateY(0); }
+
+    .ghost{
+      padding:10px 16px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.06);
+      background:transparent;
+      color:var(--muted);
+      font-weight:800;
+      text-decoration:none;
+      display:inline-flex; align-items:center;
+    }
+
+    .filters{display:flex; gap:8px; align-items:center}
+    .filter-btn{
+      padding:10px 12px; font-weight:800; border-radius:10px; border:1px solid rgba(255,255,255,0.04);
+      background:transparent; color:var(--muted); cursor:pointer;
+    }
+
+    .themes{display:flex; gap:8px; align-items:center}
+    .theme-swatch{ width:40px; height:30px; border-radius:8px; border:2px solid rgba(255,255,255,0.08); cursor:pointer; box-shadow:0 8px 22px rgba(0,0,0,0.4) }
+
+    .share{
+      padding:10px 14px; border-radius:12px; font-weight:800;
+      background:linear-gradient(135deg,#6ae2ff,#4dbdff); color:#00131e; border:1px solid rgba(255,255,255,0.35);
+      display:inline-flex; gap:8px; align-items:center; cursor:pointer;
+      box-shadow:0 8px 20px rgba(0,0,0,0.28);
+    }
+
+    .badge{
+      padding:8px 14px; border-radius:999px; font-weight:900; color:var(--accent-1);
+      background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.04);
+    }
+
+    .right{ margin-left:auto; display:flex; gap:10px; align-items:center }
+
+    /* Responsive: mobile becomes stacked, remove forced square */
+    @media(max-width:520px){
+      .card{ width: calc(100% - 36px); aspect-ratio: auto; min-height: auto; max-height: none; padding:14px; }
+      .thumb{ width:96px; height:72px; }
+      textarea{ font-size:15px; padding:12px; }
+      .btn{ width:100%; }
+      .controls{ flex-direction:column; align-items:stretch; }
+    }
+
+    /* Tablet */
+    @media(min-width:521px) and (max-width:900px){
+      .card{ width: clamp(380px, 62vw, 760px); aspect-ratio: 11/10; }
+      .thumb{ width:112px; height:84px; }
+      .btn{ padding:12px 16px; font-size:15px; }
+    }
+  </style>
+</head>
+
+<body class="">
+  <div class="wrap">
+    <div class="card">
+      <div class="accent-band"></div>
+
+      <form id="form" method="post" enctype="multipart/form-data" style="position:relative;z-index:2">
+        <textarea id="caption" name="caption" rows="2" maxlength="220" placeholder="Write..." ></textarea>
+
+        <div id="picker" class="picker" role="button" tabindex="0" aria-label="Add media">
+          <input id="file" name="media" type="file" accept="image/*,video/*,audio/*,application/pdf" style="display:none">
+          <div style="font-weight:900;color:var(--accent-1);font-size:15px">Select</div>
+          <div id="thumb" class="thumb">None</div>
+        </div>
+
+        <div id="preview"></div>
+
+        <div class="controls">
+          <div class="filters" aria-hidden>
+            <button type="button" class="filter-btn" data-filter="none">Normal</button>
+            <button type="button" class="filter-btn" data-filter="warm">Warm</button>
+            <button type="button" class="filter-btn" data-filter="cool">Cool</button>
+            <button type="button" class="filter-btn" data-filter="mono">Mono</button>
+          </div>
+
+          <div class="right">
+            <div class="themes" aria-hidden>
+              <div class="theme-swatch theme-pink" data-theme="theme-pink" style="background:linear-gradient(90deg,#ff3fa6,#23d6a6)"></div>
+              <div class="theme-swatch theme-sunset" data-theme="theme-sunset" style="background:linear-gradient(90deg,#ff7aa2,#ffd36b)"></div>
+              <div class="theme-swatch theme-neon" data-theme="theme-neon" style="background:linear-gradient(90deg,#7bffb2,#7ad1ff)"></div>
+            </div>
+
+            <span class="badge" id="streak">Streak: 0</span>
+
+            <div class="share" id="shareBtn" title="Share">Share</div>
+
+            <button id="modeBtn" type="button" class="ghost" title="Toggle dark mode">Dark</button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="btn" id="postBtn" type="submit">Post</button>
+          <a class="ghost" href="{{ url_for('home', user_id=request.args.get('user_id','')) }}">Back</a>
+        </div>
+
+        <div id="err" style="display:none;color:#ffbaba;font-size:14px;margin-top:6px"></div>
+      </form>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const MAX = 20 * 1024 * 1024;
+  const picker = document.getElementById('picker');
+  const file = document.getElementById('file');
+  const thumb = document.getElementById('thumb');
+  const preview = document.getElementById('preview');
+  const form = document.getElementById('form');
+  const caption = document.getElementById('caption');
+  const err = document.getElementById('err');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const themeSwatches = document.querySelectorAll('.theme-swatch');
+  const modeBtn = document.getElementById('modeBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const streakEl = document.getElementById('streak');
+  const postBtn = document.getElementById('postBtn');
+
+  /* Dark Mode & themes */
+  function applyMode(dark){
+    if(dark) document.body.classList.add('dark'); else document.body.classList.remove('dark');
+    localStorage.setItem('kidsta_dark', dark ? '1' : '0');
+    modeBtn.textContent = dark ? 'Light' : 'Dark';
+  }
+  applyMode(localStorage.getItem('kidsta_dark') === '1');
+
+  function applyTheme(name){
+    document.documentElement.classList.remove('theme-pink','theme-sunset','theme-neon');
+    if(name) document.documentElement.classList.add(name);
+    localStorage.setItem('kidsta_theme', name);
+  }
+  applyTheme(localStorage.getItem('kidsta_theme') || 'theme-pink');
+
+  themeSwatches.forEach(s => s.addEventListener('click', ()=> applyTheme(s.dataset.theme)));
+  modeBtn.addEventListener('click', ()=> applyMode(!document.body.classList.contains('dark')));
+
+  /* Streak */
+  function getStreak(){ return Number(localStorage.getItem('kidsta_streak')||0); }
+  function setStreak(n){ localStorage.setItem('kidsta_streak',n); streakEl.textContent = 'Streak: ' + n; }
+  setStreak(getStreak());
+
+  /* Filters */
+  let currentFilter = 'none';
+  filterBtns.forEach(b => b.addEventListener('click', ()=> { currentFilter = b.dataset.filter; applyFilter(); b.animate([{transform:'translateY(-6px)'},{transform:'translateY(0)'}],{duration:160}); }));
+
+  function applyFilter(){
+    const els = preview.querySelectorAll('img, video');
+    els.forEach(el=>{
+      if(currentFilter==='warm') el.style.filter='sepia(.22) saturate(1.18) contrast(1.04)';
+      else if(currentFilter==='cool') el.style.filter='hue-rotate(200deg) saturate(1.05) contrast(1.02)';
+      else if(currentFilter==='mono') el.style.filter='grayscale(1) contrast(1.05)';
+      else el.style.filter='none';
+    });
+  }
+
+  /* Picker + preview */
+  picker.addEventListener('click', ()=> file.click());
+  picker.addEventListener('keydown', (e)=> { if(e.key==='Enter' || e.key===' ') { e.preventDefault(); file.click(); } });
+
+  file.addEventListener('change', ()=>{
+    err.style.display='none';
+    preview.innerHTML='';
+    const f = file.files[0];
+    if(!f){ thumb.textContent='None'; preview.style.display='none'; return; }
+
+    if(f.size > MAX){
+      alert('File too large. Use < 20 MB.');
+      file.value='';
+      thumb.textContent='None';
+      preview.style.display='none';
+      return;
+    }
+
+    const url = URL.createObjectURL(f);
+    thumb.innerHTML='';
+
+    if(f.type.startsWith('image/')){
+      const img = document.createElement('img'); img.src = url;
+      img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover'; thumb.appendChild(img);
+
+      const big = document.createElement('img'); big.src = url;
+      big.style.maxWidth='100%'; big.style.maxHeight='560px'; big.style.borderRadius='10px';
+      preview.appendChild(big);
+
+    } else if(f.type.startsWith('video/')){
+      thumb.textContent = f.name;
+      const v = document.createElement('video'); v.src = url; v.controls=true;
+      v.style.maxWidth='100%'; v.style.maxHeight='560px'; preview.appendChild(v);
+
+    } else if(f.type.startsWith('audio/')){
+      thumb.textContent = f.name;
+      const a = document.createElement('audio'); a.src = url; a.controls=true; preview.appendChild(a);
+
+    } else if(f.type === 'application/pdf'){
+      thumb.textContent = f.name;
+      const a = document.createElement('a'); a.href = url; a.textContent = 'Open PDF'; a.target='_blank'; preview.appendChild(a);
+
+    } else {
+      thumb.textContent = f.name;
+      const d = document.createElement('div'); d.textContent = f.name; preview.appendChild(d);
+    }
+
+    preview.style.display = 'flex';
+    applyFilter();
+  });
+
+  /* Share */
+  shareBtn.addEventListener('click', async ()=>{
+    const f = file.files && file.files[0];
+    if(navigator.share){
+      try{
+        const data = { title:'KIDSTA', text: caption.value || '', url: window.location.href };
+        if(f && navigator.canShare && navigator.canShare({ files: [f] })){
+          await navigator.share({ files:[f], title:'KIDSTA', text: caption.value || '' });
+        } else {
+          await navigator.share(data);
+        }
+      }catch(e){}
+    } else {
+      navigator.clipboard.writeText(window.location.href).then(()=> alert('Link copied'));
+    }
+  });
+
+  /* Submit */
+  form.addEventListener('submit', (e)=>{
+    const f = file.files[0];
+    if(!f && !caption.value.trim()){
+      e.preventDefault();
+      err.style.display='block';
+      err.textContent = 'Add caption or file';
+      return;
+    }
+    if(f && f.size > MAX){ e.preventDefault(); alert('File >20MB'); return; }
+
+    // micro animation & streak increment
+    postBtn.animate([{transform:'scale(1)'},{transform:'scale(.96)'}],{duration:150});
+    setTimeout(()=> setStreak(getStreak()+1), 180);
+    // allow normal server POST
+  });
+
+})();
+</script>
+</body>
+</html>

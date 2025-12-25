@@ -1,0 +1,31 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{% extends "layout.html" %}
+{% block content %}
+  <div style="max-width:700px; margin:0 auto;">
+    <h2 style="color:var(--accent1); margin-bottom:6px;">About Kidsta</h2>
+
+    <p style="color:var(--muted-soft); font-size:14px;">
+      Kidsta is a small, safe and fun app made for kids to share pictures and short videos with friends.
+    </p>
+
+    <h3 style="margin-top:14px; color:var(--accent1);">What you can do</h3>
+    <ul style="color:var(--muted-soft); font-weight:700; line-height:1.6;">
+      <li>Create your profile with a picture and a Kidsta ID.</li>
+      <li>Search for friends and send friend requests.</li>
+      <li>Upload photos and short videos with a caption.</li>
+      <li>See posts only from people who are your friends.</li>
+    </ul>
+
+    <h3 style="margin-top:12px; color:var(--accent1);">Safety & privacy</h3>
+    <p style="color:var(--muted-soft); font-size:14px;">
+      Kidsta keeps things simple and safe. We do not share your location. Your posts are only visible to friends.
+    </p>
+
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <a href="{{ url_for('login') }}" class="btn-ghost" style="padding:8px 12px;">Back to Login</a>
+      <a href="{{ url_for('about') }}" class="btn-ghost" style="padding:8px 12px;">This page</a>
+    </div>
+  </div>
+{% endblock %}
+c
